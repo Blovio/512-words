@@ -197,7 +197,12 @@ end
 ---@param opts Options512
 ---@param filename string
 local function create(filename, opts)
-	local lines = { os.date("%A %B %d, %Y"), "", "" }
+	local lines
+	if opts.date_prefix == "" then
+		lines = { os.date("%A %B %d, %Y"), "", "" }
+	else
+		lines = { string.format("%s %s", opts.date_prefix, os.date("%A %B %d, %Y")), "", "" }
+	end
 	local buf = vim.api.nvim_create_buf(true, false)
 
 	M.buf = buf
@@ -215,6 +220,8 @@ local function create(filename, opts)
 		init_buffer(opts)
 	end
 	vim.api.nvim_win_set_cursor(0, { 3, 0 })
+	local ft = vim.filetype.match({ filename = filename })
+	vim.api.nvim_set_option_value("filetype", ft, { buf = M.buf })
 end
 
 function M.open()

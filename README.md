@@ -60,6 +60,7 @@ local defaults = {
 	words = 0x200, -- (0x200 == 512) Set the number of words required to get a star ⭐
 	storage_directory = tostring(vim.fn.stdpath("data")), -- Where all your files are saved, if you change the default "~" will be expanded for you.
 	file_extension = ".txt", -- allow configuration
+	date_prefix = "", -- useful to add header tag to date for markdown
 
 	-- NOTE: Do not alter the folder/file naming structure in the saved directory. The files are read to determine stars.
 }

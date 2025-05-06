@@ -21,10 +21,10 @@ local defaults = {
 	floating_calendar_keybind = "g.", -- Keybind to toggle calendar in normal mode.
 	split = true, -- If true, will create the journal window as a split, false creates a new buffer window
 	words = 0x200, -- (0x200 == 512) Set the number of words required to get a star ⭐
+	-- NOTE: Do not alter the folder/file naming structure in the saved directory. The files are read to determine stars.
 	storage_directory = tostring(vim.fn.stdpath("data")), -- Where all your files are saved, if you change the default "~" will be expanded for you.
 	file_extension = ".txt", -- allow configuration
-
-	-- NOTE: Do not alter the folder/file naming structure in the saved directory. The files are read to determine stars.
+	date_prefix = "", -- allows for a markdown header marker
 }
 
 ---@type Options512
