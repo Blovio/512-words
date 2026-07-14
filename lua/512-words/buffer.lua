@@ -41,11 +41,12 @@ local function get_stars_arr()
 	for _, file in ipairs(files) do
 		local filepath = M.curr_dir .. "/" .. file
 		local lines = vim.fn.readfile(filepath)
-		local text = table.concat(lines, " ")
+		-- Skip the first 2 lines (date header) to match the live counter
+		local text = table.concat(lines, " ", math.min(3, #lines + 1))
 		local count = 0
-        -- Config can count either bytes or words
-		if config.options.bytes then
-			count = #text
+		-- Config can count either characters or words
+		if config.options.characters then
+			count = vim.fn.strchars(text)
 		else
 			for _ in text:gmatch("%S+") do
 				count = count + 1
@@ -69,15 +70,15 @@ local function update_floating_window()
 	-- Ignore the first 2 lines and count the rest
 	local lines = vim.api.nvim_buf_get_lines(M.buf, 2, -1, false)
 	local text = table.concat(lines, " ")
-	local byte_count = #text
+	local char_count = vim.fn.strchars(text)
 	local current_date = os.date("*t")
 	local word_count = 0
 	for _ in text:gmatch("%S+") do
 		word_count = word_count + 1
 	end
 
-	-- Check if user has passed words (or bytes) threshold
-	local count = config.options.bytes and byte_count or word_count
+	-- Check if user has passed the words (or characters) threshold
+	local count = config.options.characters and char_count or word_count
 	local arr, offset = get_stars_arr()
 	arr[current_date.day + offset] = (count >= config.options.words) and "⭐ " or "🟩 "
 
@@ -86,7 +87,7 @@ local function update_floating_window()
 		table.concat(arr, ""),
 	})
 	vim.api.nvim_buf_set_lines(M.floating_words_buf, 0, -1, false, {
-		config.options.bytes and (" Byte Count: " .. byte_count) or (" Word Count: " .. word_count),
+		config.options.characters and (" Char Count: " .. char_count) or (" Word Count: " .. word_count),
 	})
 end
 
@@ -228,7 +229,9 @@ local function create(filename, opts)
 	end
 	vim.api.nvim_win_set_cursor(0, { 3, 0 })
 	local ft = vim.filetype.match({ filename = filename })
-	vim.api.nvim_set_option_value("filetype", ft, { buf = M.buf })
+	if ft then
+		vim.api.nvim_set_option_value("filetype", ft, { buf = M.buf })
+	end
 end
 
 function M.open()
